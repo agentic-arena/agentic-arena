@@ -46,7 +46,16 @@ Reply with row numbers, or just add rows of your own. Nothing gets built until t
 27. **Skills in-repo for v1**, `DEFAULT`: yes, in `skills/`, with the loader accepting any path so they can graduate to standalone repos later.
 28. **Replica asset policy**, `DEFAULT`: study layout/typography/spacing/interaction; substitute assets; never ship the reference site's images, fonts, or binaries; record sources in `DESIGN.md`.
 
-29. **Voice rules**, `LOCKED`. Everything the agent writes follows `docs/voice.md`: chat replies, docs, README, commit messages, PR bodies, and the copy inside generated sites. No em or en dashes, no hype words, no filler openers. Enforced by `scripts/lint_copy.py` in CI, in the commit hook, and in the agent prompt. Hyphens stay allowed.
+29. **Merge policy**, `LOCKED` (revised 2026-10-05 by you). The agent opens a pull request for each
+milestone and merges it itself once CI is green. You do not review pull requests. `main` stays protected:
+no direct pushes to it, no force pushes, and every change arrives through a pull request. Say the word if
+you want direct commits to `main` instead.
+
+30. **Working directory**, `LOCKED` (2026-10-05). Repo work happens in a temp directory under `/tmp`.
+The workspace keeps only the token file and files you asked to see. Nothing of value lives only in the
+sandbox; it gets pushed.
+
+31. **Voice rules**, `LOCKED`. Everything the agent writes follows `docs/voice.md`: chat replies, docs, README, commit messages, PR bodies, and the copy inside generated sites. No em or en dashes, no hype words, no filler openers. Enforced by `scripts/lint_copy.py` in CI, in the commit hook, and in the agent prompt. Hyphens stay allowed.
 
 ## D. Explicitly out of v1 (deferred, not deleted)
 
