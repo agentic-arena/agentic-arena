@@ -1,0 +1,9 @@
+{
+  "site_dir": "docs",
+  "index": "index.html",
+  "pages": {
+    "branch": "main",
+    "folder": "/docs",
+    "url_template": "https://{owner}.github.io/{repo}/"
+  }
+}
