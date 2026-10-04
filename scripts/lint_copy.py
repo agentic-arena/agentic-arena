@@ -147,13 +147,13 @@ SWAPS: list[tuple[str, str, str]] = [
 ]
 
 PATTERNS: list[tuple[re.Pattern, str, str, str]] = [
-    (re.compile(r"\bit'?s not just\b[^.!?\n]{0,60}\bit'?s\b", re.I), "error",
+    (re.compile(r"\bit'?s not just\b[^.!?\n]{0,60}\bit'?s\b", re.IGNORECASE), "error",
      "it's not just X, it's Y", "pick one, state it plainly"),
-    (re.compile(r"\bwe'?re (excited|thrilled|proud|delighted)\b", re.I), "error",
+    (re.compile(r"\bwe'?re (excited|thrilled|proud|delighted)\b", re.IGNORECASE), "error",
      "enthusiasm announcement", "just announce it"),
-    (re.compile(r"\b(imagine|picture) (a world|a future|if you)\b", re.I), "error",
+    (re.compile(r"\b(imagine|picture) (a world|a future|if you)\b", re.IGNORECASE), "error",
      "imagine a world opener", "cut it"),
-    (re.compile(r"[\U0001F680\U0001F525\U0001F4A1\U0001F31F\u2728]", re.U), "warn",
+    (re.compile(r"[\U0001F680\U0001F525\U0001F4A1\U0001F31F\u2728]", re.UNICODE), "warn",
      "emoji used as hype", "cut it"),
 ]
 
@@ -174,7 +174,7 @@ def scan_text(path: str, text: str, include_code: bool = False) -> list[dict]:
     for lineno, raw in enumerate(lines, start=1):
         line = raw
         stripped = line.strip()
-        if stripped.startswith("```") or stripped.startswith("~~~"):
+        if stripped.startswith(("```", "~~~")):
             in_code = not in_code
             continue
         if in_code and not include_code:
@@ -192,7 +192,8 @@ def scan_text(path: str, text: str, include_code: bool = False) -> list[dict]:
                 idx = line.find(ch, idx + 1)
 
         for phrase, severity, fix in SWAPS:
-            pat = re.compile(r"(?<![A-Za-z0-9-])" + re.escape(phrase) + r"(?![A-Za-z0-9-])", re.I)
+            bounded = r"(?<![A-Za-z0-9-])" + re.escape(phrase) + r"(?![A-Za-z0-9-])"
+            pat = re.compile(bounded, re.IGNORECASE)
             for m in pat.finditer(norm):
                 out.append({"line": lineno, "col": m.start() + 1, "severity": severity,
                             "kind": "word", "found": m.group(0), "fix": fix})
@@ -278,7 +279,8 @@ def self_test() -> int:
         p = os.path.join(td, "x.md")
         with open(p, "w", encoding="utf-8") as fh:
             fh.write("<!-- slop-lint:ignore-file -->\nWe leverage everything \u2014 seamlessly.\n")
-        ignored = is_ignored_file(open(p, encoding="utf-8").read())
+        with open(p, encoding="utf-8") as fh:
+            ignored = is_ignored_file(fh.read())
         print(f"{'ok  ' if ignored else 'FAIL'} ignore-file pragma detected")
         failures += 0 if ignored else 1
     print(f"\nself-test: {'passed' if failures == 0 else str(failures) + ' failed'}")
