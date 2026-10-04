@@ -37,7 +37,10 @@ jobs:
         run: ruff check .
 
       - name: lint prose
-        run: python scripts/lint_copy.py docs README.md CONTRIBUTING.md
+        run: python scripts/lint_copy.py docs README.md CONTRIBUTING.md showcase --ext md,html
+
+      - name: check the built page
+        run: python scripts/publish.py check
 
       - name: tests
         run: pytest -q
